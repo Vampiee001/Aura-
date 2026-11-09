@@ -1,0 +1,76 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all documents
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Lead rules
+    match /leads/{leadId} {
+      allow read: if isSignedIn() && (existing().ownerId == request.auth.uid || request.auth.token.email == 'markstephenyucada@gmail.com');
+      allow create: if isSignedIn() 
+        && isValidId(leadId)
+        && incoming().ownerId == request.auth.uid
+        && incoming().name is string && incoming().name.size() <= 128
+        && incoming().platform is string;
+      allow update: if isSignedIn()
+        && isValidId(leadId)
+        && (existing().ownerId == request.auth.uid || request.auth.token.email == 'markstephenyucada@gmail.com')
+        && incoming().ownerId == existing().ownerId;
+      allow delete: if isSignedIn()
+        && (existing().ownerId == request.auth.uid || request.auth.token.email == 'markstephenyucada@gmail.com');
+    }
+
+    // Incident rules
+    match /incidents/{incidentId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && isValidId(incidentId)
+        && incoming().facilityName is string && incoming().facilityName.size() <= 128
+        && incoming().severity in ['CRITICAL', 'WARNING', 'INFO'];
+      allow update: if isSignedIn()
+        && isValidId(incidentId);
+      allow delete: if isSignedIn()
+        && request.auth.token.email == 'markstephenyucada@gmail.com';
+    }
+
+    // Workspace Items rules
+    match /workspace_items/{itemId} {
+      allow read: if isSignedIn() && (existing().ownerId == request.auth.uid || request.auth.token.email == 'markstephenyucada@gmail.com');
+      allow create: if isSignedIn()
+        && isValidId(itemId)
+        && incoming().ownerId == request.auth.uid
+        && incoming().title is string && incoming().title.size() <= 256;
+      allow update: if isSignedIn()
+        && isValidId(itemId)
+        && (existing().ownerId == request.auth.uid || request.auth.token.email == 'markstephenyucada@gmail.com')
+        && incoming().ownerId == existing().ownerId;
+      allow delete: if isSignedIn()
+        && (existing().ownerId == request.auth.uid || request.auth.token.email == 'markstephenyucada@gmail.com');
+    }
+
+    // Test connection document for verifying connection
+    match /test/{docId} {
+      allow read: if isSignedIn();
+    }
+  }
+}

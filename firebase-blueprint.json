@@ -1,0 +1,71 @@
+{
+  "entities": {
+    "Lead": {
+      "title": "Lead",
+      "description": "Scraped and qualified real estate prospect",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "maxLength": 128 },
+        "headline": { "type": "string", "maxLength": 256 },
+        "company": { "type": "string", "maxLength": 128 },
+        "location": { "type": "string", "maxLength": 128 },
+        "platform": { "type": "string", "enum": ["linkedin", "instagram", "facebook", "web"] },
+        "sentiment": { "type": "string", "enum": ["Highly Positive", "Positive", "Neutral", "Cautious"] },
+        "intentScore": { "type": "number" },
+        "urgency": { "type": "string" },
+        "propertyInterest": { "type": "string", "maxLength": 256 },
+        "budgetRange": { "type": "string", "maxLength": 128 },
+        "ownerId": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "platform", "ownerId"]
+    },
+    "Incident": {
+      "title": "Incident",
+      "description": "Facility security alert or intrusion telemetry event",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "facilityName": { "type": "string", "maxLength": 128 },
+        "severity": { "type": "string", "enum": ["CRITICAL", "WARNING", "INFO"] },
+        "category": { "type": "string", "maxLength": 128 },
+        "description": { "type": "string", "maxLength": 512 },
+        "resolved": { "type": "boolean" },
+        "resolvedBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "facilityName", "severity", "description", "resolved"]
+    },
+    "WorkspaceItem": {
+      "title": "WorkspaceItem",
+      "description": "Cached reference to a Google Drive file, Sheet, Doc, or Calendar event",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "service": { "type": "string", "enum": ["drive", "sheets", "docs", "calendar", "gmail", "chat", "forms"] },
+        "title": { "type": "string", "maxLength": 256 },
+        "externalId": { "type": "string", "maxLength": 256 },
+        "link": { "type": "string", "maxLength": 512 },
+        "ownerId": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "service", "title", "ownerId"]
+    }
+  },
+  "firestore": {
+    "/leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Real estate leads collection"
+    },
+    "/incidents/{incidentId}": {
+      "schema": "Incident",
+      "description": "Facility security incidents"
+    },
+    "/workspace_items/{itemId}": {
+      "schema": "WorkspaceItem",
+      "description": "Connected Google Workspace sync entries"
+    }
+  }
+}

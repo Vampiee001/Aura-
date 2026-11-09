@@ -1,0 +1,6 @@
+{
+  "name": "AURA Estate & Security Intelligence",
+  "description": "Enterprise Luxury Real Estate Lead Intelligence, TOS-Compliant Social Prospecting, and Multi-Property Infrastructure Security Command Center",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
